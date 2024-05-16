@@ -21,4 +21,9 @@ export class ChatbotController {
     console.log(req);
     return this.chatbotService.chatbotFunction(req);
   }
+
+  @Get('contactos')
+  getContactos() {
+    return this.chatbotService.getContactos();
+  }
 }

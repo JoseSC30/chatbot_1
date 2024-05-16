@@ -2,6 +2,8 @@ import OpenAI from 'openai'
 import { Injectable } from '@nestjs/common';
 import { promps } from './propms'
 import { TwilioService } from 'nestjs-twilio';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 require('dotenv').config();
 
 const apiKey = process.env.OPENAI_API_KEY
@@ -14,15 +16,27 @@ let respuestaACelular = ""
 
 @Injectable()
 export class ChatbotService {
-  constructor(private readonly twilioService: TwilioService) {}
+  constructor(private readonly twilioService: TwilioService, private prisma: PrismaService) {}
 
   async chatbotFunction(any: any) {
 
     const mensajeRecibido = any.Body
     const numeroDeCelular = any.From
+    let nombreDePersona = "Alguien"
+
+    const contactos = await this.getContactos()
+    console.log(contactos[0].nombre)
+    //Si el telefono no esta en la base de datos, guardar el nombre de la persona.
+    for (let i = 0; i < contactos.length; i++) {
+      if (contactos[i].telefono === numeroDeCelular) {
+        nombreDePersona = contactos[i].nombre
+        console.log(nombreDePersona)
+        break
+      }
+    }
 
     if (messageHistory.length === 0) {
-      messageHistory.push({ role: 'user', content: instrucciones })
+      messageHistory.push({ role: 'user', content: instrucciones+nombreDePersona })
       messageHistory.push({ role: 'system', content: aceptacion})
     } else {
       // messageHistory.push({ role: 'user', content: any.message })
@@ -57,6 +71,10 @@ export class ChatbotService {
       from: 'whatsapp:+14155238886',
       to: req[1].toString()
     });
+  }
+
+  async getContactos() {
+    return this.prisma.contacto.findMany()
   }
 
 }
