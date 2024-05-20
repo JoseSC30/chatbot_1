@@ -3,78 +3,86 @@ import { Injectable } from '@nestjs/common';
 import { promps } from './propms'
 import { TwilioService } from 'nestjs-twilio';
 import { PrismaService } from 'src/prisma/prisma.service';
-
 require('dotenv').config();
 
 const apiKey = process.env.OPENAI_API_KEY
-const openai = new OpenAI( {apiKey})
-
-let messageHistory = []
+const openai = new OpenAI({ apiKey })
 const { instrucciones, aceptacion } = promps()
-
-let respuestaACelular = ""
+let historial = []
 
 @Injectable()
 export class ChatbotService {
-  constructor(private readonly twilioService: TwilioService, private prisma: PrismaService) {}
+  constructor(
+    private readonly twilioService: TwilioService,
+    private readonly prisma: PrismaService) { }
 
   async chatbotFunction(any: any) {
-
     const mensajeRecibido = any.Body
     const numeroDeCelular = any.From
-    let nombreDePersona = "Alguien"
+    const nombre = await this.getContactoByTelefono(numeroDeCelular)
 
-    const contactos = await this.getContactos()
-    console.log(contactos[0].nombre)
-    //Si el telefono no esta en la base de datos, guardar el nombre de la persona.
-    for (let i = 0; i < contactos.length; i++) {
-      if (contactos[i].telefono === numeroDeCelular) {
-        nombreDePersona = contactos[i].nombre
-        console.log(nombreDePersona)
-        break
-      }
-    }
-
-    if (messageHistory.length === 0) {
-      messageHistory.push({ role: 'user', content: instrucciones+nombreDePersona })
-      messageHistory.push({ role: 'system', content: aceptacion})
+    if (historial.length === 0) {
+      historial.push({ role: 'user', content: instrucciones + nombre })
+      historial.push({ role: 'system', content: aceptacion })
+      historial.push({ role: 'user', content: mensajeRecibido })
     } else {
-      // messageHistory.push({ role: 'user', content: any.message })
-      messageHistory.push({ role: 'user', content: mensajeRecibido })
+      historial.push({ role: 'user', content: mensajeRecibido })
     }
+
     try {
-      const gptResponse = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: messageHistory
-      })
-
-      respuestaACelular = gptResponse.choices[0].message.content
-      let res = [respuestaACelular, numeroDeCelular]
-      this.respuestaWhatsapp(res)
-
-      messageHistory.push({ role: 'system', content: gptResponse.choices[0].message.content})
-      return gptResponse.choices[0].message.content
+      const respuesta = await this.consultaChatGPT(historial)
+      historial.push({ role: 'system', content: respuesta })
+      this.enviarMensajePorWhatsapp(numeroDeCelular, respuesta)
+      console.log([
+        'hora:'+new Date(),
+        'contacto: '+nombre,
+        'numero: '+numeroDeCelular,
+        'consulta: '+mensajeRecibido,
+        'respuesta: '+respuesta]
+      )
+      return {
+        'hora': new Date(),
+        'contacto': nombre,
+        'numero': numeroDeCelular,
+        'consulta': mensajeRecibido,
+        'respuesta': respuesta}
     } catch (error) {
       console.error('Error al obtener la respuesta:', error)
       return 'Error al obtener la respues.'
     }
   }
-
-  async imprimirHistorial() {
-    return messageHistory
+  
+  async consultaChatGPT(mensaje: any[]) {
+    const gptResponse = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: mensaje
+    })
+    return gptResponse.choices[0].message.content
   }
-
-  async respuestaWhatsapp(req: any) {
-    console.log(req[0].toString())
+  
+  async enviarMensajePorWhatsapp(celular: string, mensaje: string) {
     return this.twilioService.client.messages.create({
-      body: req[0].toString(),
+      body: mensaje,
       from: 'whatsapp:+14155238886',
-      to: req[1].toString()
+      to: celular
     });
   }
 
-  async getContactos() {
-    return this.prisma.contacto.findMany()
+  async getContactoByTelefono(telefono: string) {
+    const res = await this.prisma.contacto.findFirst({
+      where: {
+        telefono: telefono
+      }
+    })
+    return res.nombre
   }
-
+  
+  async getContactos() {
+    const contactos = await this.prisma.contacto.findMany()
+    return contactos
+  }
+  
+  async imprimirHistorial() {
+    return historial
+  }
 }
