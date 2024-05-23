@@ -18,5 +18,149 @@ model contacto {
   nombre    String
   telefono  String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+}
+
+model cliente {
+  id                 Int                  @id @default(autoincrement())
+  nombre             String
+  apellido           String
+  fechaNacimiento    DateTime
+  nacionalidad       String?
+  email              String
+  infoAdicional      String?
+  createdAt          DateTime             @default(now())
+  telefono           telefono[]
+  historial_de_venta historial_de_venta[]
+  consulta           consulta[]
+}
+
+model telefono {
+  id        Int      @id @default(autoincrement())
+  cliente   cliente  @relation(fields: [clienteId], references: [id])
+  clienteId Int
+  numero    String
+  createdAt DateTime @default(now())
+}
+
+model prompt {
+  id        Int        @id @default(autoincrement())
+  propmt    String
+  createdAt DateTime   @default(now())
+  consulta  consulta[]
+}
+
+model categoria {
+  id          Int        @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  createdAt   DateTime   @default(now())
+  producto    producto[]
+}
+
+model producto {
+  id                 Int                  @id @default(autoincrement())
+  categoria          categoria            @relation(fields: [categoriaId], references: [id])
+  categoriaId        Int
+  proveedor          String?
+  nombre             String
+  descripcion        String?
+  precio             Float
+  imagenUrl          String?
+  createdAt          DateTime             @default(now())
+  historial_de_venta historial_de_venta[]
+  promocion          promocion?           @relation(fields: [promocionId], references: [id])
+  promocionId        Int?
+  inventario         inventario[]
+}
+
+model historial_de_venta {
+  id         Int      @id @default(autoincrement())
+  cliente    cliente  @relation(fields: [clienteId], references: [id])
+  clienteId  Int
+  producto   producto @relation(fields: [productoId], references: [id])
+  productoId Int
+  cantidad   Int
+  total      Float
+  createdAt  DateTime @default(now())
+}
+
+model promocion {
+  id                Int        @id @default(autoincrement())
+  nombreDePromocion String
+  descripcion       String?
+  fechaInicio       DateTime?
+  fechaFin          DateTime?
+  descuento         String
+  createdAt         DateTime   @default(now())
+  producto          producto[]
+}
+
+model inventario {
+  id                Int                 @id @default(autoincrement())
+  producto          producto            @relation(fields: [productoId], references: [id])
+  productoId        Int
+  cantidad          Int
+  fechaVencimiento  DateTime?
+  createdAt         DateTime            @default(now())
+  producto_sugerido producto_sugerido[]
+}
+
+model producto_sugerido {
+  id           Int        @id @default(autoincrement())
+  inventario   inventario @relation(fields: [inventarioId], references: [id])
+  inventarioId Int
+  prioridad    Int
+  activo       Boolean
+  createdAt    DateTime   @default(now())
+  consulta     consulta[]
+}
+
+model sintoma {
+  id                  Int                   @id @default(autoincrement())
+  nombre              String
+  descripcion         String?
+  createdAt           DateTime              @default(now())
+  diagnostico_sintoma diagnostico_sintoma[]
+}
+
+model diagnostico {
+  id                  Int                   @id @default(autoincrement())
+  nombre              String
+  descripcion         String?
+  createdAt           DateTime              @default(now())
+  diagnostico_sintoma diagnostico_sintoma[]
+  consulta            consulta[]
+}
+
+model diagnostico_sintoma {
+  id            Int         @id @default(autoincrement())
+  diagnostico   diagnostico @relation(fields: [diagnosticoId], references: [id])
+  diagnosticoId Int
+  sintoma       sintoma     @relation(fields: [sintomaId], references: [id])
+  sintomaId     Int
+  createdAt     DateTime    @default(now())
+}
+
+model consulta {
+  id                 Int               @id @default(autoincrement())
+  cliente            cliente           @relation(fields: [clienteId], references: [id])
+  clienteId          Int
+  propmt             prompt            @relation(fields: [promptId], references: [id])
+  promptId           Int
+  diagnostico        diagnostico       @relation(fields: [diagnosticoId], references: [id])
+  diagnosticoId      Int
+  productoSugerido   producto_sugerido @relation(fields: [productoSugeridoId], references: [id])
+  productoSugeridoId Int
+  createdAt          DateTime          @default(now())
+  mensaje            mensaje[]
+}
+
+model mensaje {
+  id         Int      @id @default(autoincrement())
+  consulta   consulta @relation(fields: [consultaId], references: [id])
+  consultaId Int
+  chatbot    Boolean
+  contenido  String
+  hora       DateTime @default(now())
+  createdAt  DateTime @default(now())
 }

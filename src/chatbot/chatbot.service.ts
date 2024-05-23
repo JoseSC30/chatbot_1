@@ -20,38 +20,29 @@ export class ChatbotService {
     const mensajeRecibido = any.Body
     const numeroDeCelular = any.From
     const nombre = await this.getContactoByTelefono(numeroDeCelular)
-
-    if (historial.length === 0) {
-      historial.push({ role: 'user', content: instrucciones + nombre })
-      historial.push({ role: 'system', content: aceptacion })
-      historial.push({ role: 'user', content: mensajeRecibido })
-    } else {
-      historial.push({ role: 'user', content: mensajeRecibido })
-    }
-
     try {
+      if (historial.length === 0) {
+        historial.push({ role: 'user', content: instrucciones + nombre })
+        historial.push({ role: 'system', content: aceptacion })
+      }
+      historial.push({ role: 'user', content: mensajeRecibido })
       const respuesta = await this.consultaChatGPT(historial)
       historial.push({ role: 'system', content: respuesta })
       this.enviarMensajePorWhatsapp(numeroDeCelular, respuesta)
-      console.log([
-        'hora:'+new Date(),
-        'contacto: '+nombre,
-        'numero: '+numeroDeCelular,
-        'consulta: '+mensajeRecibido,
-        'respuesta: '+respuesta]
-      )
-      return {
-        'hora': new Date(),
-        'contacto': nombre,
-        'numero': numeroDeCelular,
-        'consulta': mensajeRecibido,
-        'respuesta': respuesta}
+      const res =
+        ['hora:' + new Date(),
+        'contacto: ' + nombre,
+        'numero: ' + numeroDeCelular,
+        'consulta: ' + mensajeRecibido,
+        'respuesta: ' + respuesta]
+      console.log(res)
+      return res
     } catch (error) {
       console.error('Error al obtener la respuesta:', error)
       return 'Error al obtener la respues.'
     }
   }
-  
+
   async consultaChatGPT(mensaje: any[]) {
     const gptResponse = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
@@ -59,7 +50,7 @@ export class ChatbotService {
     })
     return gptResponse.choices[0].message.content
   }
-  
+
   async enviarMensajePorWhatsapp(celular: string, mensaje: string) {
     return this.twilioService.client.messages.create({
       body: mensaje,
@@ -76,12 +67,12 @@ export class ChatbotService {
     })
     return res.nombre
   }
-  
+
   async getContactos() {
     const contactos = await this.prisma.contacto.findMany()
     return contactos
   }
-  
+
   async imprimirHistorial() {
     return historial
   }
