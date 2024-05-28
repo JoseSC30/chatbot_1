@@ -44,7 +44,7 @@ model telefono {
 
 model prompt {
   id        Int        @id @default(autoincrement())
-  propmt    String
+  prompt    String
   createdAt DateTime   @default(now())
   consulta  consulta[]
 }
@@ -112,7 +112,7 @@ model producto_sugerido {
   prioridad    Int
   activo       Boolean
   createdAt    DateTime   @default(now())
-  consulta     consulta[]
+  // consulta     consulta[]
 }
 
 model sintoma {
@@ -129,7 +129,7 @@ model diagnostico {
   descripcion         String?
   createdAt           DateTime              @default(now())
   diagnostico_sintoma diagnostico_sintoma[]
-  consulta            consulta[]
+  // consulta            consulta[]
 }
 
 model diagnostico_sintoma {
@@ -147,10 +147,10 @@ model consulta {
   clienteId          Int
   propmt             prompt            @relation(fields: [promptId], references: [id])
   promptId           Int
-  diagnostico        diagnostico       @relation(fields: [diagnosticoId], references: [id])
-  diagnosticoId      Int
-  productoSugerido   producto_sugerido @relation(fields: [productoSugeridoId], references: [id])
-  productoSugeridoId Int
+  // diagnostico        diagnostico       @relation(fields: [diagnosticoId], references: [id])
+  // diagnosticoId      Int
+  // productoSugerido   producto_sugerido @relation(fields: [productoSugeridoId], references: [id])
+  // productoSugeridoId Int
   createdAt          DateTime          @default(now())
   mensaje            mensaje[]
 }

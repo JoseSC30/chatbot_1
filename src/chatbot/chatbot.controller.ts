@@ -11,6 +11,11 @@ export class ChatbotController {
     return this.chatbotService.chatbotFunction(any);
   }
 
+  @Post('chatbot-prueba')
+  chatbotPrueba(@Body() any: any) {
+    return this.chatbotService.chatbotPrueba(any);
+  }
+
   @Get('imprimir-historial')
   imprimirHistorial() {
     return this.chatbotService.imprimirHistorial();
