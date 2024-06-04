@@ -6,29 +6,13 @@ import { Request } from 'express';
 export class ChatbotController {
   constructor(private readonly chatbotService: ChatbotService) {}
 
-  @Post('chatbot-function')
-  chatbotFunction(@Body() any: any) {
-    return this.chatbotService.chatbotFunction(any);
-  }
-
-  @Post('chatbot-prueba')
-  chatbotPrueba(@Body() any: any) {
-    return this.chatbotService.chatbotPrueba(any);
+  @Post('chatbot')
+  chatbot(@Body() any: any) {
+    return this.chatbotService.chatbot(any);
   }
 
   @Get('imprimir-historial')
   imprimirHistorial() {
     return this.chatbotService.imprimirHistorial();
-  }
-
-  @Post('prueba')
-  prueba(@Body() req: Request) {
-    console.log(req);
-    return this.chatbotService.chatbotFunction(req);
-  }
-
-  @Get('contactos')
-  getContactos() {
-    return this.chatbotService.getContactos();
   }
 }

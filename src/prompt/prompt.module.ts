@@ -7,6 +7,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 @Module({
   controllers: [PromptController],
   providers: [PromptService],
+  exports: [PromptService],
   imports: [PrismaModule]
 })
 export class PromptModule {}
