@@ -15,4 +15,10 @@ export class ChatbotController {
   imprimirHistorial() {
     return this.chatbotService.imprimirHistorial();
   }
+
+  @Get('sintomas')
+  getSintomas() {
+    return this.chatbotService.getSintomas();
+  }
+
 }
