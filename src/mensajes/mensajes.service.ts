@@ -20,15 +20,33 @@ export class MensajesService {
     return mensajes;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} mensaje`;
+  async findOne(id: number) {
+    const mensaje = await this.prisma.mensaje.findUnique({
+      where: { id },
+    });
+    return mensaje;
   }
 
-  update(id: number, updateMensajeDto: UpdateMensajeDto) {
-    return `This action updates a #${id} mensaje`;
+  async update(id: number, updateMensajeDto: UpdateMensajeDto) {
+    const mensaje = await this.prisma.mensaje.update({
+      where: { id },
+      data: updateMensajeDto,
+    });
+    return mensaje;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} mensaje`;
+  async remove(id: number) {
+    const mensaje = await this.prisma.mensaje.delete({
+      where: { id },
+    });
+    return mensaje;
+  }
+
+  //------ OTROS ------
+  async findAllMensajesByConsultaId(consultaId: number) {
+    const mensajes = await this.prisma.mensaje.findMany({
+      where: { consultaId },
+    });
+    return mensajes;
   }
 }

@@ -20,15 +20,31 @@ export class PromptService {
     return prompts;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} prompt`;
+  async findOne(id: number) {
+    const prompt = await this.prisma.prompt.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return prompt;
   }
 
-  update(id: number, updatePromptDto: UpdatePromptDto) {
-    return `This action updates a #${id} prompt`;
+  async update(id: number, updatePromptDto: UpdatePromptDto) {
+    const prompt = await this.prisma.prompt.update({
+      where: {
+        id: id,
+      },
+      data: updatePromptDto,
+    });
+    return prompt;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} prompt`;
+  async remove(id: number) {
+    const prompt = await this.prisma.prompt.delete({
+      where: {
+        id: id,
+      },
+    });
+    return prompt;
   }
 }

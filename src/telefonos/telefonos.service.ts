@@ -20,15 +20,33 @@ export class TelefonosService {
     return telefonos;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} telefono`;
+  async findOne(id: number) {
+    const telefono = await this.prisma.telefono.findUnique({
+      where: { id },
+    });
+    return telefono;
   }
 
-  update(id: number, updateTelefonoDto: UpdateTelefonoDto) {
-    return `This action updates a #${id} telefono`;
+  async update(id: number, updateTelefonoDto: UpdateTelefonoDto) {
+    const telefono = await this.prisma.telefono.update({
+      where: { id },
+      data: updateTelefonoDto,
+    });
+    return telefono;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} telefono`;
+  async remove(id: number) {
+    const telefono = await this.prisma.telefono.delete({
+      where: { id },
+    });
+    return telefono;
+  }
+
+  //------ OTROS ------
+  async findInfoByNumber(numero: string) {
+    const telefono = await this.prisma.telefono.findFirst({
+      where: { numero },
+    });
+    return telefono;
   }
 }

@@ -20,15 +20,32 @@ export class ClientesService {
     return clientes;    
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cliente`;
+  async findOne(id: number) {
+    const cliente = await this.prisma.cliente.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    return cliente;
   }
 
-  update(id: number, updateClienteDto: UpdateClienteDto) {
-    return `This action updates a #${id} cliente`;
+  async update(id: number, updateClienteDto: UpdateClienteDto) {
+    const cliente = await this.prisma.cliente.update({
+      where: {
+        id: id,
+      },
+      data: updateClienteDto,
+    });
+    return cliente;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cliente`;
+  async remove(id: number) {
+    const cliente = await this.prisma.cliente.delete({
+      where: {
+        id: id,
+      },
+    });
+    console.log("Cliente eliminado: \n\n", cliente);
+    return cliente;
   }
 }

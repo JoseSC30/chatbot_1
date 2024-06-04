@@ -20,15 +20,41 @@ export class ConsultasService {
     return consultas;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} consulta`;
+  async findOne(id: number) {
+    const consulta = await this.prisma.consulta.findUnique({
+      where: { id },
+    });
+    return consulta;
   }
 
-  update(id: number, updateConsultaDto: UpdateConsultaDto) {
-    return `This action updates a #${id} consulta`;
+  async update(id: number, updateConsultaDto: UpdateConsultaDto) {
+    const consulta = await this.prisma.consulta.update({
+      where: { id },
+      data: updateConsultaDto,
+    });
+    return consulta;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} consulta`;
+  async remove(id: number) {
+    const consulta = await this.prisma.consulta.delete({
+      where: { id },
+    });
+    return consulta;
+  }
+
+  //------ OTROS ------
+  async findAllByClienteId(clienteId: number) {
+    const consultas = await this.prisma.consulta.findMany({
+      where: { clienteId },
+    });
+    return consultas;
+  }
+
+  async findLastConsultaByClienteId(clienteId: number) {
+    const consulta = await this.prisma.consulta.findFirst({
+      where: { clienteId },
+      orderBy: { createdAt: 'desc' },
+    });
+    return consulta;
   }
 }

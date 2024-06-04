@@ -6,6 +6,7 @@ import { PrismaModule } from 'src/prisma/prisma.module';
 @Module({
   controllers: [TelefonosController],
   providers: [TelefonosService],
+  exports: [TelefonosService],
   imports: [PrismaModule],
 })
 export class TelefonosModule {}
