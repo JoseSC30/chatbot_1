@@ -32,7 +32,8 @@ export class ChatbotService {
   async chatbot(any: any) {
     const mensajeRecibido = any.Body
     const whatsappCliente = any.From
-
+    // const res  = await this.guardarPalabrasClave(mensajeRecibido)
+    // return res
     if (historial.length === 0) {
       await this.registrarPrimeraConsultaPorDefecto(whatsappCliente)
     }
@@ -62,6 +63,26 @@ export class ChatbotService {
     const instruccion = prompt.prompt
     const ultimaConsulta = await this.consultasService.findLastConsultaByClienteId(id_cliente)
 
+    let infoDiagnosticos = ""
+    const diagnosticos = await this.prisma.diagnostico.findMany()
+    for (let i = 0; i < diagnosticos.length; i++) {
+      infoDiagnosticos = infoDiagnosticos + diagnosticos[i].nombre + '\n' + diagnosticos[i].descripcion + '\n'
+    }
+
+    let inventario = ""
+    const productos = await this.prisma.producto.findMany()
+    const inventarioProductos = await this.prisma.inventario.findMany()
+    for (let i = 0; i < productos.length; i++) {
+      for (let j = 0; j < inventarioProductos.length; j++) {
+        if (productos[i].id === inventarioProductos[j].productoId) {
+          inventario = inventario + productos[i].nombre + 
+          '\nPrecio ' + productos[i].precio + " bs." +
+          '\nCantidad ' +inventarioProductos[j].cantidad + " unidades." +
+          '\nfecha de vencimiento ' + inventarioProductos[j].fechaVencimiento + '\n'
+        }
+      }
+    }
+
     let mensajesDeUltimaConsulta = ""
     if (ultimaConsulta != null) {
       const mensajes = await this.mensajesService.findAllMensajesByConsultaId(ultimaConsulta.id)
@@ -79,6 +100,10 @@ export class ChatbotService {
       content:
         `Instrucciones:
           ${instruccion}
+          Información de los diagnosticos:
+          ${infoDiagnosticos}
+          Inventario:
+          ${inventario}
           Información del cliente:
           ${infoCliente}
           Contenido de la anterior conversación:
@@ -128,10 +153,99 @@ export class ChatbotService {
     timeoutId = setTimeout(this.vaciarHistorial, 60000)//Despues de un minuto sin mensajes nuevos, se da por terminada la consulta.
   }
 
-  //------ SINTOMAS & DIAGNOSTICOS ------ (EN DESARROLLO)
+  //------ SINTOMAS & DIAGNOSTICOS ------ (EN DESARROLLO).
 
   async getSintomas() {
     const sintomas = await this.prisma.sintoma.findMany()
     return sintomas
   }
+
+  async getDiagnosticos() {
+    const diagnosticos = await this.prisma.diagnostico.findMany()
+    return diagnosticos
+  }
+
+  //Guardar cada palabra clave del mensaje en un arreglo. Es decir, exceptuar los espacios, los signos de puntuacion y las palabras como por ejemplo "el", "la", "de", "en", etc.
+  // async guardarPalabrasClave(mensaje: string) {
+  //   let palabrasClave = mensaje.split(' ')
+  //   // - Elimina los espacios, los signos de puntuación y los convierte en palabras vacias.
+  //   for (let i = 0; i < palabrasClave.length; i++) {
+  //     palabrasClave[i] = palabrasClave[i].replace(/[^a-zA-Z ]/g, "")
+  //   }
+  //   // - Elimina las palabras vacías.
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "")
+  //   // - Elimina las palabras comunes.
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "el")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "la")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "de")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "en")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "los")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "por")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "para")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "con")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "sin")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "sobre")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "ante")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "bajo")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "hacia")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "según")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "tras")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "durante")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "mediante")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "excepto")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "salvo")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "a")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "ante")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "bajo")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "contra")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "desde")
+  //   palabrasClave = palabrasClave.filter(palabra => palabra !== "y")
+  //   const sintomasEncontrados = await this.compararSintomasConPalabrasClave(palabrasClave)
+  //   const diagnostico_sintoma = await this.prisma.diagnostico_sintoma.findMany()
+  //   //Comparar "sintomasEncotrados" y "diagnosticos" con la tabla "diagnostico_sintoma", y devolver el diagnostico correspondiente.
+  //   let diagnosticosEncontrado = []
+  //   for (let i = 0; i < sintomasEncontrados.length; i++) {
+  //     for (let j = 0; j < diagnostico_sintoma.length; j++) {
+  //       if (sintomasEncontrados[i] === diagnostico_sintoma[j].sintomaId) {
+  //         diagnosticosEncontrado.push(diagnostico_sintoma[j].diagnosticoId)
+  //       }
+  //     }
+  //   }
+  //   //Contar la cantidad de veces que se repite cada diagnostico en "diagnosticosEncontrado".
+  //   let contador = {}
+  //   for (let i = 0; i < diagnosticosEncontrado.length; i++) {
+  //     const diagnostico = diagnosticosEncontrado[i]
+  //     contador[diagnostico] = (contador[diagnostico] || 0) + 1
+  //   }
+  //   //Devolver el diagnostico con mayor cantidad de repeticiones.
+  //   let diagnosticoMasRepetido = null
+  //   let cantidadDeRepeticiones = 0
+  //   let diagnosticoPreFinal = null
+  //   for (const diagnostico in contador) {
+  //     if (contador[diagnostico] > cantidadDeRepeticiones) {
+  //       cantidadDeRepeticiones = contador[diagnostico]
+  //       diagnosticoMasRepetido = diagnostico
+  //     }
+  //   }
+  //   const diagnosticoFinal = await this.prisma.diagnostico.findUnique({ where: { id: Number(diagnosticoMasRepetido) } })
+  //   if (diagnosticoFinal === null) {
+  //     return "No se encontró un diagnóstico."
+  //   }
+  //   return diagnosticoFinal.nombre
+  // }
+
+  //Comparar las palabras clave del mensaje con los sintomas de la base de datos.
+  // async compararSintomasConPalabrasClave(palabrasClave: string[]) {
+  //   const sintomas = await this.getSintomas()
+  //   let sintomasEncontrados = []
+  //   for (let i = 0; i < palabrasClave.length; i++) {
+  //     for (let j = 0; j < sintomas.length; j++) {
+  //       if (palabrasClave[i] === sintomas[j].nombre) {
+  //         sintomasEncontrados.push(sintomas[j].id)
+  //       }
+  //     }
+  //   }
+  //   return sintomasEncontrados
+  // }
+
 }
