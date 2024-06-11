@@ -8,6 +8,7 @@ import { ClientesModule } from 'src/clientes/clientes.module';
 import { MensajesModule } from 'src/mensajes/mensajes.module';
 import { TelefonosModule } from 'src/telefonos/telefonos.module';
 import { PromptModule } from 'src/prompt/prompt.module';
+import { ChromadbModule } from 'src/chromadb/chromadb.module';
 
 @Module({
   controllers: [ChatbotController],
@@ -21,6 +22,7 @@ import { PromptModule } from 'src/prompt/prompt.module';
     ConsultasModule,
     MensajesModule,
     TelefonosModule,
-    PromptModule]
+    PromptModule,
+    ChromadbModule]
 })
 export class ChatbotModule { }
