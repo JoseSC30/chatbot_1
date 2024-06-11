@@ -21,6 +21,7 @@ export class ChromadbService {
           })
     }
 
+    
     async crearColeccion() {
         try {
             const collection = await this.client.createCollection({
