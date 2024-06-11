@@ -93,7 +93,7 @@ export class ChromadbService {
 
     async probar() {
         const res = await this.client.listCollections()//Lista todas las colecciones
-        // const res = await this.client.countCollections()//Cantidad de colecciones
+        // const res = await this.client.countCollections()//Cantidad de colecciones.
 
         // const coleccion = await this.client.getCollection({ name: "enfermedades" })//Obtiene una coleccion
         // const res = await coleccion.get({ limit: 20 });//Obtiene todos los documentos de una coleccion
