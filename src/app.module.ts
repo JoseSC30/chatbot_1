@@ -8,10 +8,11 @@ import { TelefonosModule } from './telefonos/telefonos.module';
 import { PromptModule } from './prompt/prompt.module';
 import { ConsultasModule } from './consultas/consultas.module';
 import { MensajesModule } from './mensajes/mensajes.module';
+import { ChromadbModule } from './chromadb/chromadb.module';
 require('dotenv').config();
 
 @Module({
-  imports: [ChatbotModule, ClientesModule, TelefonosModule, PromptModule, ConsultasModule, MensajesModule],
+  imports: [ChatbotModule, ClientesModule, TelefonosModule, PromptModule, ConsultasModule, MensajesModule, ChromadbModule],
   controllers: [AppController],
   providers: [AppService],
 })
