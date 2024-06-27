@@ -78,7 +78,7 @@ export class ChromadbService {
                 queryTexts: [body.contenido],
                 nResults: 2
             });
-            console.log(results)
+            // console.log(results)
             return results
         } catch (error) {
             console.log(error)

@@ -9,10 +9,17 @@ import { PromptModule } from './prompt/prompt.module';
 import { ConsultasModule } from './consultas/consultas.module';
 import { MensajesModule } from './mensajes/mensajes.module';
 import { ChromadbModule } from './chromadb/chromadb.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 require('dotenv').config();
 
 @Module({
-  imports: [ChatbotModule, ClientesModule, TelefonosModule, PromptModule, ConsultasModule, MensajesModule, ChromadbModule],
+  imports: [ChatbotModule, ClientesModule, TelefonosModule, PromptModule,
+    ConsultasModule, MensajesModule, ChromadbModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public')
+    })
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
