@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
 import { ChatbotService } from './chatbot.service';
 import { Request } from 'express';
 
@@ -20,5 +20,20 @@ export class ChatbotController {
   getSintomas() {
     return this.chatbotService.getSintomas();
   }
+
+  @Post('qwe')
+  getMatriz(@Body() any: any) {
+    return this.chatbotService.getMatriz(any);
+  }
+
+//   @Get('descargar-pdf')
+// async descargarPDF(@Res() res: Response) {
+//   const pdfFilePath = this.chatbotService.generarPDF(); // Genera el PDF
+
+//   res.setHeader('Content-Type', 'application/pdf');
+//   res.setHeader('Content-Disposition', 'attachment; filename=example.pdf'); // Nombre del archivo
+
+//   fs.createReadStream(pdfFilePath).pipe(res);
+// }
 
 }
